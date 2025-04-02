@@ -8,6 +8,7 @@
 #include "proc.h"
 #include "fs.h"
 
+
 /*
  * the kernel's page table.
  */
@@ -488,9 +489,33 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
 
 
 #ifdef LAB_PGTBL
-void
-vmprint(pagetable_t pagetable) {
-  // your code here
+
+// Hàm đệ quy để in bảng trang
+void vmprint_rec(pagetable_t pagetable, int depth) {
+    if (pagetable == 0)
+        return;
+
+    for (int i = 0; i < 512; i++) {
+        pte_t pte = pagetable[i];
+        if (pte & PTE_V) {  // Kiểm tra nếu PTE hợp lệ
+            uint64 pa = PTE2PA(pte);  // Trích xuất địa chỉ vật lý
+
+            // In theo độ sâu của cây bảng trang
+            for (int j = 0; j < depth; j++)
+                printf(" ..");
+            printf("%d: pte %p pa %p\n", i, (void*)pte, (void *)pa);
+
+            // Nếu là bảng trang trung gian, gọi đệ quy
+            if ((pte & (PTE_R | PTE_W | PTE_X)) == 0) {
+                vmprint_rec((pagetable_t)pa, depth + 1);
+            }
+        }
+    }
+}
+
+void vmprint(pagetable_t pagetable) {
+  printf("page table %p\n", (void *)pagetable);
+  vmprint_rec(pagetable, 1);
 }
 #endif
 
