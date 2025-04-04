@@ -491,7 +491,7 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
 #ifdef LAB_PGTBL
 
 // Hàm đệ quy để in bảng trang
-void vmprint_rec(pagetable_t pagetable, int depth) {
+void vmprint_rec(pagetable_t pagetable, int level) {
     if (pagetable == 0)
         return;
 
@@ -501,13 +501,13 @@ void vmprint_rec(pagetable_t pagetable, int depth) {
             uint64 pa = PTE2PA(pte);  // Trích xuất địa chỉ vật lý
 
             // In theo độ sâu của cây bảng trang
-            for (int j = 0; j < depth; j++)
-                printf(" ..");
+            for (int j = 0; j < level; j++)
+                printf("..");
             printf("%d: pte %p pa %p\n", i, (void*)pte, (void *)pa);
 
             // Nếu là bảng trang trung gian, gọi đệ quy
             if ((pte & (PTE_R | PTE_W | PTE_X)) == 0) {
-                vmprint_rec((pagetable_t)pa, depth + 1);
+                vmprint_rec((pagetable_t)pa, level + 1);
             }
         }
     }

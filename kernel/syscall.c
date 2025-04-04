@@ -102,6 +102,7 @@ extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_ptableprint(void);
+extern uint64 sys_signalPTE(void);
 
 
 #ifdef LAB_NET
@@ -139,7 +140,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_ptableprint] sys_ptableprint,
+[SYS_signalPTE] sys_signalPTE,
 #ifdef LAB_NET
 [SYS_bind] sys_bind,
 [SYS_unbind] sys_unbind,

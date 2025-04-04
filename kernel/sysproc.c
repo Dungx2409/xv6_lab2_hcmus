@@ -124,8 +124,22 @@ sys_uptime(void)
   return xticks;
 }
 
-uint64 sys_ptableprint(void) {
-  struct proc *p = myproc();
-  vmprint(p->pagetable);
+int pte_print_enabled = 0;
+
+uint64
+sys_signalPTE(void)
+{
+  int enable;
+  
+  argint(0, &enable);
+  // Thiết lập flag
+  if(enable != 0 && enable != 1)
+    return -1;
+  if(enable) {
+    printf("PTE print enabled\n");
+  } else {
+    printf("PTE print disabled\n");
+  }
+  pte_print_enabled = enable;
   return 0;
 }

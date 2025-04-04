@@ -26,7 +26,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int ptableprint(void);
+int signalPTE(int);
 #ifdef LAB_NET
 int bind(uint32);
 int unbind(uint32);
