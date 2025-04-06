@@ -101,7 +101,6 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
-extern uint64 sys_ptableprint(void);
 extern uint64 sys_signalPTE(void);
 
 
