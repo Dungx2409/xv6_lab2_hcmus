@@ -36,5 +36,4 @@
 #define SYS_pgpte     33
 #define SYS_kpgtbl    34
 #define SYS_signalPTE 35
-
-
+#define SYS_pgaccess  36

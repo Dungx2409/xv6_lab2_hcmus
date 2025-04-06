@@ -17,6 +17,12 @@ r_mhartid()
 #define MSTATUS_MPP_U (0L << 11)
 #define MSTATUS_MIE (1L << 3)    // machine-mode interrupt enable.
 
+#define PTE_W (1L << 2)
+#define PTE_R (1L << 1)
+#define PTE_V (1L << 0)
+#define PTE_U (1L << 4)
+#define PTE_A (1L << 6)
+
 static inline uint64
 r_mstatus()
 {
@@ -375,7 +381,7 @@ typedef uint64 *pagetable_t; // 512 PTEs
 #define PTE_W (1L << 2)
 #define PTE_X (1L << 3)
 #define PTE_U (1L << 4) // user can access
-
+#define PTE_A (1L << 6) // accessed
 
 
 #if defined(LAB_MMAP) || defined(LAB_PGTBL)

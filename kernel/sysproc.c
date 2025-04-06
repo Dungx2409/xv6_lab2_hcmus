@@ -100,7 +100,43 @@ sys_kpgtbl(void)
   return 0;
 }
 #endif
+#ifdef LAB_PGTBL
+#define MAX_PAGES_TO_CHECK 64  // Limit to 64 pages (fits in a uint64 bitmask)
 
+uint64 sys_pgaccess(void) {
+  uint64 start;
+  int npages;
+  uint64 abitsaddr;
+  uint64 mask;
+  uint64 abits;
+
+  struct proc *p = myproc();
+  argaddr(0, &start);
+  argint(1, &npages);
+  argaddr(2, &abitsaddr);
+
+  if (npages <= 0 || npages > 64)
+    return -1;
+
+  mask = 1;
+  abits = 0;
+  for(int i = 0; i < npages; i++) {
+    uint64 va = start + i * PGSIZE;
+    pte_t *pte = walk(p->pagetable, va, 0);
+    // Check if PTE exists and is valid before checking access bit
+    if(pte && (*pte & PTE_V) && (*pte & PTE_A)) {
+      abits |= mask;
+      // Clear the access bit
+      *pte &= ~PTE_A;
+    }
+    mask <<= 1;
+  }
+
+  if (copyout(p->pagetable, abitsaddr, (char *)&abits, sizeof(abits)) < 0)
+    return -1;
+  return 0;
+}
+#endif
 
 uint64
 sys_kill(void)
