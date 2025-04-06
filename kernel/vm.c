@@ -502,7 +502,7 @@ void vmprint_rec(pagetable_t pagetable, int level) {
 
             // In theo độ sâu của cây bảng trang
             for (int j = 0; j < level; j++)
-                printf("..");
+                printf(" ..");
             printf("%d: pte %p pa %p\n", i, (void*)pte, (void *)pa);
 
             // Nếu là bảng trang trung gian, gọi đệ quy

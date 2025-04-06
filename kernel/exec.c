@@ -129,7 +129,7 @@ exec(char *path, char **argv)
   p->trapframe->epc = elf.entry;  // initial program counter = main
   p->trapframe->sp = sp; // initial stack pointer
   proc_freepagetable(oldpagetable, oldsz);
-  if(pte_print_enabled && (strncmp(argv[0], "sh", 2) != 0) && (strncmp(argv[0], "ptabletest", 10) != 0)) {
+  if(pte_print_enabled && (strncmp(argv[0], "ptabletest", 10) != 0)) {
     vmprint(p->pagetable);
   }
   return argc; // this ends up in a0, the first argument to main(argc, argv)
@@ -143,6 +143,7 @@ exec(char *path, char **argv)
   }
   return -1;
 }
+// && (strncmp(argv[0], "sh", 2) != 0) 
 
 // Load a program segment into pagetable at virtual address va.
 // va must be page-aligned
