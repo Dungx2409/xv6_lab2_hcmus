@@ -1,0 +1,47 @@
+I/ File "kernel/syscall.h", thêm:
+    1. "#define SYS_signalPTE 35": Định nghĩa mã số (ID) cho một system call có tên là signalPTE.
+II/ File "kernel/syscall.c", thêm:
+    1. "extern uint64 sys_signalPTE(void);": Cho trình biên dịch biết rằng có một hàm với tên đó ở nơi khác (file khác) và có thể sử dụng trong file này.
+    2.  "static uint64 (*syscalls[])(void) = {
+        ...
+        [SYS_signalPTE] sys_signalPTE,
+        };": Ánh xạ mã số system call (SYS_signalPTE) đến hàm xử lý tương ứng (sys_signalPTE) trong mảng syscalls[].
+III/ File "kernel/vm.c", thêm:
+    1. Hàm vmprint_rec(): Thực hiện chức năng in bảng trang cho hàm vmprint().
+    Triển khai hàm vmprint_rec():
+        void vmprint_rec(pagetable_t pagetable, int level) {
+            if (pagetable == 0)
+                return;
+
+            for (int i = 0; i < 512; i++) {
+                pte_t pte = pagetable[i];
+                if (pte & PTE_V) {  // Kiểm tra nếu PTE hợp lệ
+                    uint64 pa = PTE2PA(pte);  // Trích xuất địa chỉ vật lý
+
+                    // In theo độ sâu của cây bảng trang
+                    for (int j = 0; j < level; j++)
+                        printf(" ..");
+                    printf("%d: pte %p pa %p\n", i, (void*)pte, (void *)pa);
+
+                    // Nếu là bảng trang trung gian, gọi đệ quy
+                    if ((pte & (PTE_R | PTE_W | PTE_X)) == 0) {
+                        vmprint_rec((pagetable_t)pa, level + 1);
+                    }
+                }
+            }
+        }
+IV/ File "kernel/sysproc.c", thêm:
+    1. "int pte_print_enabled = 0;": Là một biến toàn cục dùng để lưu trạng thái có in thông tin PTE hay không. 0 nghĩa là đang tắt chức năng in PTE, ngược lại là 1.
+    2. "sys_signalPTE(void)": Hàm thực thi khi user gọi system call signalPTE
+
+V/ File "kernel/exec.c", thêm: 
+    1. "extern int pte_print_enabled;": Cho trình biên dịch biết rằng có một hàm với tên đó ở nơi khác (file khác) và có thể sử dụng trong file này. Cụ thể là biến "pte_print_enabled" được khai báo trong file "sysproc.c"
+    2. Trong hàm  "int exec(char *path, char **argv)", thêm điều kiện:
+    "   if(pte_print_enabled && (strncmp(argv[0], "ptabletest", 10) != 0)) {
+            vmprint(p->pagetable);
+        }": Nếu  pte_print_enabled = 0, thì bảng trang không thể in, nếu pte_print_enabled = 1, in ra thông tin của page table của tiến trình hiện tại. Ở đây "p->pagetable" là page table của tiến trình vừa được nạp bởi exec.
+VI/ File "user/usys.pl", thêm:
+    1. entry("signalPTE"); Tạo stub syscall signalPTE trong user space để gọi kernel syscall
+VII/ Tạo file "ptabletest.c" trong folder "user/": Kiểm tra và minh hoạ chức năng in Page Table (PTE) của một tiến trình
+    - File "ptabletest.c" truyền vào 1 đối số [0, 1]: Tắt hoặc Bật tính năng in bảng trang của một tiến trình
+VIII/ Cuối cùng, thêm "$U/_ptabletest\" vào Makefile: Biên dịch chương trình ptabletest.c trong thư mục user/ thành file thực thi ptabletest và chèn nó vào image của hệ điều hành xv6 khi build.
